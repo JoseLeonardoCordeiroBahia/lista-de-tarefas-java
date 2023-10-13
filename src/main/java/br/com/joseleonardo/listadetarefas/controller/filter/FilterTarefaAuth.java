@@ -47,18 +47,22 @@ public class FilterTarefaAuth extends OncePerRequestFilter {
 			String senha = credenciais[1];
 
 			// Válidar se o usuário existe no banco de dados
-			Usuario usuarioExistente = this.usuarioRepository.findByNomeDeUsuario(nomeDeUsuario);
+			Usuario usuario = this.usuarioRepository.findByNomeDeUsuario(nomeDeUsuario);
 
-			if (usuarioExistente == null) {
+			if (usuario == null) {
 				response.sendError(401);
 			} else { // Se o usuário existir vamos validar a senha
 				// Validar se a senha está correta ou não
-				Result verificarSenha = BCrypt.verifyer().verify(senha.toCharArray(), usuarioExistente.getSenha());
+				Result verificarSenha = BCrypt.verifyer().verify(senha.toCharArray(), usuario.getSenha());
 
 				if (verificarSenha.verified) { // Se a senha estiver correta seguir com o método
 					// Segue viagem
+
+					// Passa o atributo para o controller
+					request.setAttribute("idDoUsuario", usuario.getId());
+
 					filterChain.doFilter(request, response);
-				} else { // Se a senha estiver incorreta retornar o erro de não autorizado
+				} else { // Se a senha estiver incorreta retornar um erro
 					response.sendError(401);
 				}
 			}
