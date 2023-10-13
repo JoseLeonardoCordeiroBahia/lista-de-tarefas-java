@@ -8,4 +8,6 @@ import br.com.joseleonardo.listadetarefas.model.entity.Usuario;
 
 public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
 
+	Usuario findByNomeDeUsuario(String nomeDeUsuario);
+	
 }
