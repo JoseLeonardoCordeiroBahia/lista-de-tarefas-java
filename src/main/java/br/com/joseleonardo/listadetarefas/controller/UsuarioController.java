@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import at.favre.lib.crypto.bcrypt.BCrypt;
 import br.com.joseleonardo.listadetarefas.model.entity.Usuario;
 import br.com.joseleonardo.listadetarefas.model.repository.UsuarioRepository;
 
@@ -28,8 +29,12 @@ public class UsuarioController {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Esse nome de usuário já existe!");
 		}
 		
+		String senhaCriptografada = BCrypt.withDefaults().hashToString(12, usuario.getSenha().toCharArray());
+		
+		usuario.setSenha(senhaCriptografada);
+		
 		Usuario usuarioCriado = usuarioRepository.save(usuario);
-
+		
 		return ResponseEntity.status(HttpStatus.CREATED).body(usuarioCriado);
 	}
 
