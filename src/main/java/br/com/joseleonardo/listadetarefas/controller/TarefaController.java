@@ -29,7 +29,7 @@ public class TarefaController {
 
 	@PostMapping
 	public ResponseEntity<?> criar(@RequestBody Tarefa tarefa, HttpServletRequest request) {
-		UUID idDoUsuario = (UUID) request.getAttribute("idDoUsuario");
+		UUID idDoUsuario = (UUID) request.getAttribute("idUsuario");
 		
 		tarefa.setIdDoUsuario(idDoUsuario);
 
@@ -52,23 +52,36 @@ public class TarefaController {
 
 	@GetMapping
 	public List<Tarefa> listar(HttpServletRequest request) {
-		UUID idDoUsuario = (UUID) request.getAttribute("idDoUsuario");
+		UUID idDoUsuario = (UUID) request.getAttribute("idUsuario");
 		
-		List<Tarefa> tarefas = tarefaRepository.findByIdDoUsuario(idDoUsuario);
+		List<Tarefa> tarefas = tarefaRepository.findByIdDoUsuario((UUID) idDoUsuario);
 		
 		return tarefas;
 	}
 
 	// http://localhost:8080/tarefas/idDaTarefa
 	@PutMapping("/{id}")
-	public Tarefa atualizar(@PathVariable UUID id, @RequestBody Tarefa tarefa, HttpServletRequest request) {
+	public ResponseEntity<?> atualizar(@PathVariable UUID id, @RequestBody Tarefa tarefa, HttpServletRequest request) {
 		// Retorna a tarefa se existir se não retorna null
 		Tarefa tarefaExistente = this.tarefaRepository.findById(id).orElse(null);
+
+		if (tarefaExistente == null) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tarefa não encontrada");
+		}
+
+		UUID idDoUsuario = (UUID) request.getAttribute("idUsuario");
+
+		if (!tarefaExistente.getIdDoUsuario().equals(idDoUsuario)) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+					.body("Usuário não tem permissão para alterar essa tarefa");
+		}
 
 		// Executa nossa classe Utils para ignorar as propriedades nulas e "mesclar" as informações
 		Utils.copyNonNullProperties(tarefa, tarefaExistente);
 
-		return tarefaRepository.save(tarefaExistente);
+		Tarefa tarefaAtualizada = tarefaRepository.save(tarefaExistente);
+
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(tarefaAtualizada);
 	}
 
 }
