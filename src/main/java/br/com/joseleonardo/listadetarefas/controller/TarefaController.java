@@ -8,13 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import br.com.joseleonardo.listadetarefas.model.entity.Tarefa;
 import br.com.joseleonardo.listadetarefas.model.repository.TarefaRepository;
+import br.com.joseleonardo.listadetarefas.util.Utils;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
@@ -54,6 +57,18 @@ public class TarefaController {
 		List<Tarefa> tarefas = tarefaRepository.findByIdDoUsuario(idDoUsuario);
 		
 		return tarefas;
+	}
+
+	// http://localhost:8080/tarefas/idDaTarefa
+	@PutMapping("/{id}")
+	public Tarefa atualizar(@PathVariable UUID id, @RequestBody Tarefa tarefa, HttpServletRequest request) {
+		// Retorna a tarefa se existir se não retorna null
+		Tarefa tarefaExistente = this.tarefaRepository.findById(id).orElse(null);
+
+		// Executa nossa classe Utils para ignorar as propriedades nulas e "mesclar" as informações
+		Utils.copyNonNullProperties(tarefa, tarefaExistente);
+
+		return tarefaRepository.save(tarefaExistente);
 	}
 
 }
