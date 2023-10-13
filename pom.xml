@@ -14,7 +14,7 @@
 
 	<groupId>br.com.joseleonardo</groupId>
 	<artifactId>lista-de-tarefas</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>lista-de-tarefas</name>
 	<description>Gerenciador para lista de tarefas</description>
 
