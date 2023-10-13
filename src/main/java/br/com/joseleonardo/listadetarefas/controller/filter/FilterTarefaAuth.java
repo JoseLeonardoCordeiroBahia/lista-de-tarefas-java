@@ -27,7 +27,7 @@ public class FilterTarefaAuth extends OncePerRequestFilter {
 			throws ServletException, IOException {
 		String servletPath = request.getServletPath();
 
-		if (servletPath.equals("/tarefas")) {
+		if (servletPath.startsWith("/tarefas")) {
 			// Pegar a autenticação (nome de usuário e senha) de forma codificada
 			String authorization = request.getHeader("Authorization");
 
